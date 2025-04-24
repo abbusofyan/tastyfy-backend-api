@@ -1,0 +1,1742 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "TasteAsia RESTful API",
+        "description": "RESTful API Documentation for TasteAsia. Explore our endpoints and discover how to interact with our delicious data!",
+        "contact": {
+            "email": "gabrielaswinta@cosrsivalab.space"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://tasteasia.test",
+            "description": "TasteAsia API Server"
+        },
+        {
+            "url": "https://tasteasia.test/api/v1",
+            "description": "Local Development Server"
+        },
+        {
+            "url": "${STAGING_URL}/api/v1",
+            "description": "STAGING API Server"
+        },
+        {
+            "url": "https://tasteasia.test/api/v1",
+            "description": "PRODUCTION API Server"
+        }
+    ],
+    "paths": {
+        "/m/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login and send OTP for verification",
+                "operationId": "loginUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+6588837454"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "OTP sent successfully. Please verify to log in."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "properties": {
+                                                "code": {
+                                                    "type": "integer",
+                                                    "example": 401
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Invalid login credentials"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 401
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ]
+            }
+        },
+        "/m/verify-login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify OTP and log in",
+                "operationId": "verifyLoginWithOTP",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone",
+                                    "password",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "otp": {
+                                        "type": "integer",
+                                        "example": 123456
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/refresh-token": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh access and refresh tokens",
+                "operationId": "refreshTokens",
+                "responses": {
+                    "200": {
+                        "description": "Tokens refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "properties": {
+                                                "code": {
+                                                    "type": "integer",
+                                                    "example": 401
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Invalid login credentials"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 401
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Token Expired",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "properties": {
+                                                "code": {
+                                                    "type": "integer",
+                                                    "example": 499
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Refresh Token Expired! Please re login"
+                                                },
+                                                "status": {
+                                                    "type": "integer",
+                                                    "example": 400
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    },
+                    {
+                        "Refresh Token": []
+                    }
+                ]
+            }
+        },
+        "/m/lost-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Lost Password",
+                "description": "Generates a new password for the user and sends it to their phone by sms.",
+                "operationId": "d973a79e74adc8f0b27d6794a4c4c88c",
+                "requestBody": {
+                    "description": "User phone to reset password",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "phone": {
+                                        "description": "The phone number of the user",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successfully, new password sent to your phone by sms.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Success status",
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "description": "Response message",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/m/register-send-otp": {
+            "post": {
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "Send OTP to a phone number for registration",
+                "operationId": "registerSendOTP",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+15017122661"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "OTP sent successfully!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to send OTP",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/m/register": {
+            "post": {
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "Register a new user",
+                "operationId": "registerUser",
+                "requestBody": {
+                    "description": "User registration details (multipart/form-data)",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User successfully registered",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User successfully registered!"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/LoginResponse"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Registration failed due to an error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ]
+            }
+        },
+        "/m/banner-management": {
+            "get": {
+                "tags": [
+                    "Banner Management"
+                ],
+                "summary": "Get Banner Management",
+                "operationId": "dc4a9e569923bd94ba99f79f2d336614",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/m/banner-management/create": {
+            "post": {
+                "tags": [
+                    "Banner Management"
+                ],
+                "summary": "Create new banner",
+                "description": "Create new banner",
+                "operationId": "22dc84d1f142cf5b43af0f70693a0645",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "url": {
+                                        "description": "Url Target",
+                                        "type": "string",
+                                        "example": "https://example.com/endpoint"
+                                    },
+                                    "group": {
+                                        "type": "string",
+                                        "example": "Featured Management"
+                                    },
+                                    "file": {
+                                        "description": "Please upload image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/banner-management/update": {
+            "post": {
+                "tags": [
+                    "Banner Management"
+                ],
+                "summary": "Update banner by ID",
+                "description": "Update banner by ID",
+                "operationId": "6847fb90f13501fcdd7ac42df0edac63",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "url": {
+                                        "description": "Url Target",
+                                        "type": "string",
+                                        "example": "https://example.com/endpoint"
+                                    },
+                                    "file": {
+                                        "description": "Please upload image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/banner-management/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Banner Management"
+                ],
+                "summary": "Delete banner by ID",
+                "description": "Delete banner by ID",
+                "operationId": "fdaa8192c10c65624b60c77ca6505db5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/banner-management/sort": {
+            "post": {
+                "tags": [
+                    "Banner Management"
+                ],
+                "summary": "Sort banner",
+                "description": "Sort banner",
+                "operationId": "db9137af07254a464f8abd22ae259151",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "list_banner": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "number",
+                                                    "example": "1"
+                                                },
+                                                "order": {
+                                                    "type": "number",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/customer/details": {
+            "get": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Get Customer Details",
+                "description": "Retrieves detailed information about the currently authenticated customer.",
+                "operationId": "b2344bb07512b13cb12923164a082c01",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user_id": {
+                                            "description": "The ID of the user",
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "description": "The name of the user",
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "description": "The email address of the user",
+                                            "type": "string"
+                                        },
+                                        "customer_id": {
+                                            "description": "The customer ID",
+                                            "type": "string"
+                                        },
+                                        "customer_role": {
+                                            "description": "The customer role",
+                                            "type": "string"
+                                        },
+                                        "credit_balance": {
+                                            "description": "The credit balance",
+                                            "type": "number"
+                                        },
+                                        "cash_balance": {
+                                            "description": "The cash balance",
+                                            "type": "number"
+                                        },
+                                        "credit_split": {
+                                            "description": "The credit split",
+                                            "type": "number"
+                                        },
+                                        "cash_split": {
+                                            "description": "The cash split",
+                                            "type": "number"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/m/customer/delete": {
+            "delete": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Delete Customer Account",
+                "description": "Allows the currently authenticated customer to delete their account.",
+                "operationId": "dc79e13202bc1364c20a4f1f31a55739",
+                "responses": {
+                    "200": {
+                        "description": "Account deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Success status",
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "description": "Response message",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/m/customer/reset-password": {
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Reset Customer Password",
+                "description": "Allows the currently authenticated customer to reset their password.",
+                "operationId": "03777ee84e518be55af9f0d0c5f5fba8",
+                "requestBody": {
+                    "description": "Password reset data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "old_password": {
+                                        "description": "Old password",
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "new_password": {
+                                        "description": "New password",
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "new_password_confirmation": {
+                                        "description": "New password confirmation",
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Success status",
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "description": "Response message",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/m/location/create": {
+            "post": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Add new location",
+                "description": "Add new location",
+                "operationId": "face1662e4f548ee18e79092758d3502",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Name of the location",
+                                        "type": "string",
+                                        "example": "SIT - Singapore Institute of Technology"
+                                    },
+                                    "address": {
+                                        "description": "address of the location",
+                                        "type": "string",
+                                        "example": "11 New Punggol Road"
+                                    },
+                                    "url": {
+                                        "description": "location URL",
+                                        "type": "string",
+                                        "example": "https://maps.app.goo.gl/K1oMjsLwU2p2ZJo7A"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Indicates if the transaction was successful",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "location": {
+                                            "description": "location data",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/location/all": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Get location list",
+                "description": "Retrieves all location",
+                "operationId": "e6b8bc834f3169b94eca8374f0f9f695",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "description": "The ID of the location",
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "description": "Location name",
+                                            "type": "string"
+                                        },
+                                        "address": {
+                                            "description": "Location Address",
+                                            "type": "string"
+                                        },
+                                        "country": {
+                                            "description": "Location country",
+                                            "type": "string"
+                                        },
+                                        "postal_code": {
+                                            "description": "Location Postal Code",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/m/location/toggle-status": {
+            "post": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Toggle location status between active and inactive",
+                "description": "Toggle location status",
+                "operationId": "f32dbb93340dfa4fd74744abfdd05eec",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "location_id": {
+                                        "description": "Location ID",
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "status": {
+                                        "description": "Location status",
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Indicates if the transaction was successful",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "description": "response message",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/product/all": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get all products",
+                "description": "Get a list of all products",
+                "operationId": "b8e30c44c112f603899e7eea45c083f1",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Limit of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Products retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "last_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "tags": [
+                    "Welcome"
+                ],
+                "summary": "Welcome to TasteAsia API",
+                "description": "A simple greeting message to get you started.",
+                "operationId": "c51e6db61762d9d756cb5a326fae0688",
+                "responses": {
+                    "200": {
+                        "description": "API Welcome Message"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    }
+                ]
+            }
+        },
+        "/vm/transaction/new": {
+            "post": {
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Create new transaction",
+                "description": "Create new transaction and waiting for payment",
+                "operationId": "f983416140aab3e7638197a220d273f8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "vending_machine_id": {
+                                        "description": "Identifier for the vending machine",
+                                        "type": "number",
+                                        "example": "1"
+                                    },
+                                    "items": {
+                                        "description": "Details of the products",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "product_id": {
+                                                    "description": "Identifier for the product. It can be combination of Alpah-numeric character",
+                                                    "type": "string",
+                                                    "example": "ABC1234def"
+                                                },
+                                                "qty": {
+                                                    "description": "Quantity of item",
+                                                    "type": "number",
+                                                    "example": 10
+                                                },
+                                                "unit_price": {
+                                                    "description": "Price of the product",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 1.5
+                                                },
+                                                "total_price": {
+                                                    "description": "Total price of the product",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 15
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "total_price": {
+                                        "description": "Total price",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 15
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Indicates if the transaction was successful",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "description": "Transaction status message",
+                                            "type": "string",
+                                            "example": "Waiting for payment."
+                                        },
+                                        "transaction_id": {
+                                            "description": "Transaction ID",
+                                            "type": "string",
+                                            "example": 1739893690674
+                                        },
+                                        "qrcode": {
+                                            "description": "URL of the QR code for payment",
+                                            "type": "string",
+                                            "example": "https://example.com/qrcode"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/transaction/pay": {
+            "post": {
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Pay for a Transaction",
+                "description": "Pay for a transaction using cash, credit, or a mix of both.",
+                "operationId": "961452e4b06f322c38e2db6e6f016c5a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "transaction_id": {
+                                        "description": "Identifier for the transaction",
+                                        "type": "number",
+                                        "example": "1739893690674"
+                                    },
+                                    "payment_method": {
+                                        "description": "Payment method (0 for cash, 1 for credit, 2 for mix)",
+                                        "type": "number",
+                                        "example": "0"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Indicates if the transaction was successful",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "description": "Transaction status message",
+                                            "type": "string",
+                                            "example": "Payment Success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/vm/transaction/get/{id}": {
+            "get": {
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Get detail transaction",
+                "description": "get detail transaction",
+                "operationId": "cab86c6a846a1a97fcb85fc6d542e454",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "transaction id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1739893690674"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Transaction retrieved successfully"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "Array",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/m/wallet/topup": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Topup Cash Balance",
+                "description": "Topup customer's cash balance with Hitpay Payment Gateway",
+                "operationId": "7ca380f021ae73362608e2cf2a68a5d5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "amount": {
+                                        "description": "Amount to top-up",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 50
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Top-up successful",
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "description": "success",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        },
+        "/m/wallet/history/{type}": {
+            "post": {
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Usage history of cash or credit",
+                "description": "Type of wallet history (cash or credit)",
+                "operationId": "87cfecead19e6963b335c261a1786acc",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "Type of wallet history (cash or credit)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Cash"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Top-up successful",
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "description": "success",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Token": []
+                    },
+                    {
+                        "Access Token": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "RegisterRequest": {
+                "description": "Request body for user registration",
+                "required": [
+                    "name",
+                    "phone",
+                    "otp",
+                    "password"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "User's full name",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "description": "User's phone number (e.g., +6588837454)",
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "email": {
+                        "description": "User's unique email address",
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "otp": {
+                        "description": "One-time password verification code",
+                        "type": "integer",
+                        "example": "123456"
+                    },
+                    "password": {
+                        "description": "User's password (will be hashed)",
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "description": "Password confirmation to ensure accuracy",
+                        "type": "string",
+                        "format": "password"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginResponse": {
+                "title": "Login Response",
+                "description": "Response structure for successful login",
+                "required": [
+                    "id",
+                    "access_token",
+                    "access_token_expires_at",
+                    "refresh_token",
+                    "refresh_token_expires_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "User ID",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "description": "User name",
+                        "type": "string"
+                    },
+                    "access_token": {
+                        "description": "Access Token",
+                        "type": "string"
+                    },
+                    "access_token_expires_at": {
+                        "description": "Timestamp of access token expiration",
+                        "type": "integer"
+                    },
+                    "refresh_token": {
+                        "description": "Refresh Token",
+                        "type": "string"
+                    },
+                    "refresh_token_expires_at": {
+                        "description": "Timestamp of refresh token expiration",
+                        "type": "integer"
+                    },
+                    "customer_id": {
+                        "description": "Customer ID (if the user is a customer)",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "role": {
+                        "description": "Customer role (if the user is a customer)",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "permissions": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "description": "Permission names (if the user is a customer)",
+                            "type": "string"
+                        }
+                    },
+                    "credit_balance": {
+                        "description": "Credit balance (if the user has the 'have credit' permission)",
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "format": "float"
+                    },
+                    "cash_balance": {
+                        "description": "Cash balance (if the user has the 'have cash' permission)",
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "format": "float"
+                    },
+                    "cash_split": {
+                        "description": "Cash split (if the user has the 'have cash' permission)",
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "format": "float"
+                    },
+                    "credit_split": {
+                        "description": "Credit split (if the user has the 'have cash' permission)",
+                        "type": [
+                            "number",
+                            "null"
+                        ],
+                        "format": "float"
+                    },
+                    "is_first_login": {
+                        "description": "to identify if the user is first login or not (using 1 or 0)",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "title": "Error Response",
+                "description": "Standard error response format",
+                "required": [
+                    "error"
+                ],
+                "properties": {
+                    "error": {
+                        "required": [
+                            "code",
+                            "message",
+                            "status"
+                        ],
+                        "properties": {
+                            "code": {
+                                "description": "Error code from the ApiErrorCode enum",
+                                "type": "string",
+                                "enum": [
+                                    "SERVER_ERROR",
+                                    "UNAUTHORIZED",
+                                    "BAD_REQUEST",
+                                    "INVALID_TOKEN",
+                                    "TOKEN_EXPIRED",
+                                    "TOKEN_MISSING",
+                                    "TOKEN_STOLEN",
+                                    "TOKEN_TYPE",
+                                    "USER_NOT_FOUND",
+                                    "REGISTRATION_ERROR",
+                                    "VALIDATION_ERROR"
+                                ]
+                            },
+                            "message": {
+                                "description": "Error message",
+                                "type": "string"
+                            },
+                            "status": {
+                                "description": "HTTP status code",
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "Customer": {
+                "title": "Customer",
+                "description": "Customer model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "gender": {
+                        "type": "string"
+                    },
+                    "dob": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "email_verified_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "profile_photo_path": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "customer": {
+                        "$ref": "#/components/schemas/Customer"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "Bearer Token": {
+                "type": "http",
+                "description": "Enter token in format 'Bearer {token}'. Token is a 64-character random string.",
+                "scheme": "bearer"
+            },
+            "Access Token": {
+                "type": "apiKey",
+                "description": "Sanctum Access Token (a random string)",
+                "name": "X-Taste-Asia-Access-Token",
+                "in": "header"
+            },
+            "Refresh Token": {
+                "type": "apiKey",
+                "description": "Sanctum Refresh Token (a random string)",
+                "name": "X-Taste-Asia-Refresh-Token",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Welcome",
+            "description": "Introductory endpoints for the API."
+        },
+        {
+            "name": "Registration",
+            "description": "Endpoints for creating new user accounts."
+        },
+        {
+            "name": "Authentication",
+            "description": "Endpoints for user login, token management, and authorization."
+        },
+        {
+            "name": "Customer",
+            "description": "Endpoints for user login, token management, and authorization."
+        },
+        {
+            "name": "Homepage",
+            "description": "Endpoints for mobile Homepage."
+        },
+        {
+            "name": "Wallet",
+            "description": "Endpoints for managing user's cash and credit balances and transactions."
+        },
+        {
+            "name": "Transaction",
+            "description": "Endpoints for managing transaction from vending machine."
+        },
+        {
+            "name": "Product",
+            "description": "Endpoints for managing products."
+        },
+        {
+            "name": "Location",
+            "description": "Endpoints for managing location."
+        }
+    ]
+}

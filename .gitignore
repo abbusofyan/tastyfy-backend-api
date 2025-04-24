@@ -1,0 +1,36 @@
+# Laravel Specific
+/vendor/
+node_modules/
+public/storage
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+npm-debug.log
+yarn-error.log
+.idea/
+.phpunit.result.cache
+.phpstorm.meta.php
+
+# Laravel cache & logs
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+storage/app/*
+!storage/app/.gitignore
+storage/framework/*
+!storage/framework/.gitignore
+storage/logs/*
+!storage/logs/.gitignore
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# Composer & NPM related
+composer.lock
+package-lock.json
+yarn.lock
+
+# Optional: ignore tests results or debug output
+coverage/
+*.log

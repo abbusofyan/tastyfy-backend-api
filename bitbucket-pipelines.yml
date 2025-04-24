@@ -1,0 +1,11 @@
+image: node:20.10.0
+pipelines:
+  branches:
+    staging:
+      - step:
+          name: Laravel Staging
+          script:
+            - apt-get update && apt-get install unzip -y
+            - apt-get install openssh-client -y
+            - chmod 400 sample-nodejs.pem
+            - ssh -i sample-nodejs.pem $ssh_name@$aapanel_ftp_dns 'bash -s' < execute.sh
